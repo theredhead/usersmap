@@ -1,0 +1,14 @@
+<output class="radius-value" aria-live="polite">{{ intl.radius(value(), unit()) }}</output>
+<ui-slider
+  [value]="value()"
+  [min]="min()"
+  [max]="max()"
+  [step]="step()"
+  [disabled]="disabled()"
+  [ariaLabel]="'Privacy radius: ' + intl.radius(value(), unit())"
+  (valueChange)="change($event)"
+/>
+<div class="radius-limits">
+  <span>{{ intl.radius(min(), unit()) }}</span>
+  <span>{{ intl.radius(max(), unit()) }}</span>
+</div>

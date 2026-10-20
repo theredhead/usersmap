@@ -1,0 +1,45 @@
+.location-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 1fr);
+  gap: 24px;
+  margin-bottom: 50px;
+}
+.location-map {
+  height: 600px;
+  border: 1px solid var(--ui-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.form-panel > ui-button {
+  margin-bottom: 12px;
+}
+.existing-locations {
+  border-top: 1px solid var(--ui-border);
+  margin-top: 24px;
+  padding-top: 16px;
+}
+.existing-locations h3 {
+  font-size: 14px;
+  font-weight: 500;
+}
+.saved-location {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  padding: 10px 0;
+}
+.saved-location small {
+  display: block;
+  font-size: 10px;
+  color: var(--ui-text-muted);
+  margin-top: 4px;
+}
+@media (max-width: 760px) {
+  .location-layout {
+    grid-template-columns: 1fr;
+  }
+  .location-map {
+    height: 360px;
+  }
+}

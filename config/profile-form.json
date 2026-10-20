@@ -1,0 +1,48 @@
+{
+  "id": "newton-profile-v1",
+  "title": "Your Newton collection",
+  "groups": [
+    {
+      "id": "hardware",
+      "title": "Which Newton(s) do you own?",
+      "description": "Released Newton OS devices, including licensed hardware.",
+      "fields": [
+        {
+          "id": "messagepad",
+          "title": "Apple MessagePad (Original MessagePad / H1000)",
+          "component": "checkbox"
+        },
+        { "id": "messagepad100", "title": "Apple MessagePad 100", "component": "checkbox" },
+        { "id": "messagepad110", "title": "Apple MessagePad 110", "component": "checkbox" },
+        { "id": "messagepad120", "title": "Apple MessagePad 120", "component": "checkbox" },
+        { "id": "messagepad130", "title": "Apple MessagePad 130", "component": "checkbox" },
+        { "id": "messagepad2000", "title": "Apple MessagePad 2000", "component": "checkbox" },
+        { "id": "messagepad2100", "title": "Apple MessagePad 2100", "component": "checkbox" },
+        { "id": "emate300", "title": "Apple eMate 300", "component": "checkbox" },
+        { "id": "sharpExpertpad7000", "title": "Sharp ExpertPad PI-7000", "component": "checkbox" },
+        { "id": "sharpExpertpad7100", "title": "Sharp ExpertPad PI-7100", "component": "checkbox" },
+        { "id": "motorolaMarco", "title": "Motorola Marco", "component": "checkbox" },
+        { "id": "digitalOceanTarpon", "title": "Digital Ocean Tarpon", "component": "checkbox" },
+        {
+          "id": "digitalOceanSeahorse",
+          "title": "Digital Ocean Seahorse",
+          "component": "checkbox"
+        },
+        { "id": "siemensNotephone", "title": "Siemens NotePhone", "component": "checkbox" },
+        { "id": "harrisSupertech2000", "title": "Harris SuperTech 2000", "component": "checkbox" },
+        {
+          "id": "favoriteApp",
+          "title": "Favorite Newton app",
+          "component": "text",
+          "validation": [
+            {
+              "type": "maxLength",
+              "params": { "max": 200 },
+              "message": "Use 200 characters or fewer."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

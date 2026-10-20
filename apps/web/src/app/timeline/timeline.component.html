@@ -1,0 +1,130 @@
+<section
+  #scroll
+  class="timeline-scroll"
+  aria-label="Community timeline"
+  (scroll)="store.timelineScroll.set(scroll.scrollTop)"
+>
+  <div class="panel-heading">
+    <div>
+      <span class="eyebrow">THE LATEST CHAPTER</span>
+      <h2>{{ intl.timeline }}</h2>
+    </div>
+    <div class="heading-actions">
+      <span class="live-label"
+        ><span class="status-dot" [class.offline]="!store.connected()"></span>{{ store.connected() ?
+        'Live' : 'Reconnecting' }}</span
+      >
+      @if (api.session().member?.profileComplete) {
+      <ui-button size="small" (click)="openComposer()">Post a message</ui-button>
+      }
+    </div>
+  </div>
+  @if (api.session().member?.profileComplete) {
+  <ui-dialog
+    class="message-composer-dialog"
+    [(open)]="composerOpen"
+    ariaLabel="Post a message"
+    [closeOnBackdropClick]="!api.busy()"
+    [closeOnEscape]="!api.busy()"
+  >
+    <ui-dialog-header>
+      <h3>Post a message</h3>
+      <ui-button
+        class="composer-close"
+        variant="outlined"
+        size="small"
+        ariaLabel="Close message dialog"
+        [disabled]="api.busy()"
+        (click)="composerOpen.set(false)"
+        ><span aria-hidden="true">×</span></ui-button
+      >
+    </ui-dialog-header>
+    <ui-dialog-body>
+      @if (composerOpen()) {
+      <div class="composer">
+        @if (api.error()) {
+        <p class="composer-error" role="alert">{{ api.error() }}</p>
+        }
+        <div [class.is-busy]="api.busy()" [attr.inert]="api.busy() ? '' : null">
+          <ui-form
+            [engine]="composer.engine()"
+            [submitLabel]="api.busy() ? 'Please wait…' : 'Post update ↗'"
+            [fieldMinWidth]="200"
+            (formSubmit)="post($event)"
+          />
+        </div>
+        <span class="small muted"
+          >250 characters · one update per {{ api.configuration()!.postIntervalSeconds }}
+          seconds</span
+        >
+        <span class="small muted"
+          >Video links open on the original site; no third-party player is loaded here.</span
+        >
+        <span class="small muted"
+          >Optional upload · {{ api.configuration()!.maximumUploadBytes / 1000000 }} MB max ·
+          uploaded videos up to {{ api.configuration()!.maximumVideoSeconds }} seconds</span
+        >
+      </div>
+      }
+    </ui-dialog-body>
+  </ui-dialog>
+  } @else {
+  <div class="empty-state">
+    <p>A good introduction goes a long way.</p>
+    <a routerLink="/settings">Complete your profile to start posting ↗</a>
+  </div>
+  }
+  <div class="posts">
+    @for (post of store.posts(); track post.id) {
+    <article class="post">
+      <ui-avatar
+        [name]="post.author?.nickname || intl.deletedUser"
+        [src]="post.author?.avatarUrl || undefined"
+        size="medium"
+      />
+      <div class="post-content">
+        <div class="post-byline">
+          @if (post.author) {
+          <a [routerLink]="['/members', post.author.id]">{{ post.author.nickname }}</a>
+          } @else {
+          <strong>{{ intl.deletedUser }}</strong>
+          }
+          <time [attr.datetime]="post.createdAt">{{ intl.date(post.createdAt) }}</time>
+        </div>
+        @if (post.body) {
+        <p class="post-body">{{ post.body }}</p>
+        } @if (post.videoUrl; as videoUrl) {
+        <a class="video-link" [href]="videoUrl" target="_blank" rel="noopener noreferrer">
+          <strong>Watch video ↗</strong>
+          <span>{{ videoHost(videoUrl) }}</span>
+          <span class="video-url">{{ videoUrl }}</span>
+          <small>Opens on the video site in a new tab</small>
+        </a>
+        } @if (post.media; as media) { @if (media.type === 'image') {
+        <img
+          class="post-media"
+          [src]="media.url"
+          alt="Image shared with this post"
+          loading="lazy"
+        />
+        } @else {
+        <video class="post-media" [src]="media.url" controls preload="metadata" playsinline></video>
+        } }
+      </div>
+    </article>
+    } @empty {
+    <div class="empty-state">
+      <span class="empty-symbol">✳</span>
+      <h3>A small world starts with a hello.</h3>
+      <p>Share a discovery, a project, or a little Newton nostalgia.</p>
+    </div>
+    }
+  </div>
+  @if (store.nextCursor()) {
+  <div class="load-more">
+    <ui-button variant="outlined" (click)="loadMore()" [disabled]="api.busy()"
+      >{{ intl.loadMore }}</ui-button
+    >
+  </div>
+  }
+</section>

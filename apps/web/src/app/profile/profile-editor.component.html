@@ -1,0 +1,44 @@
+@if (api.session().member; as member) {
+<div class="page-heading">
+  <a routerLink="/">← Back to the world</a><span class="eyebrow">YOUR LITTLE CORNER</span>
+  <h1>{{ intl.title }}</h1>
+  <p>Only your nickname is required. Share as much—or as little—as you like.</p>
+</div>
+<div class="editor-layout">
+  <aside class="profile-summary">
+    <ui-avatar [name]="member.nickname" [src]="member.avatarUrl || undefined" [size]="90" />
+    <h2>{{ member.nickname }}</h2>
+    <p>{{ member.punchline || 'A new face in a familiar world.' }}</p>
+    <div class="summary-note">
+      Your birth date stays private.<br />Locations are always optional.
+    </div>
+    <a routerLink="/location">Manage your locations ↗</a>
+  </aside>
+  <section class="form-panel" [class.is-busy]="api.busy()">
+    <ui-form
+      [engine]="engine"
+      [submitLabel]="api.busy() ? 'Saving…' : intl.save"
+      [fieldMinWidth]="220"
+      (formSubmit)="save($event)"
+    />
+    <section class="danger-zone">
+      <h3>Leave no personal trace</h3>
+      <p>
+        Your account, profile, locations, avatar, and sessions will be deleted. Public posts and
+        their attachments remain under “Deleted user”.
+      </p>
+      <ui-form
+        [engine]="deletionEngine"
+        submitLabel="Delete my account"
+        [fieldMinWidth]="200"
+        (formSubmit)="deleteAccount()"
+      />
+    </section>
+  </section>
+</div>
+} @else {
+<div class="empty-state">
+  <h1>Sign in to make yourself at home.</h1>
+  <a href="/api/auth/discord">Continue with Discord ↗</a>
+</div>
+}

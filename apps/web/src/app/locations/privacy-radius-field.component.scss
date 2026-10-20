@@ -1,0 +1,16 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+.radius-value {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.radius-limits {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--ui-text-muted);
+}

@@ -1,0 +1,118 @@
+<div
+  #container
+  class="map-shell"
+  (pointerdown)="pointerDown($event)"
+  (pointermove)="pointerMove($event)"
+  (pointerup)="pointerUp($event)"
+  (pointercancel)="gesture = null"
+>
+  <ui-map-view
+    [center]="center()"
+    [zoom]="zoom()"
+    (centerChange)="centerChanged($event)"
+    (zoomChange)="zoomChanged($event)"
+    interactionMode="interactive"
+    height="100%"
+    width="100%"
+    [tileUrl]="api.configuration()!.tileUrl"
+    [attribution]="attribution"
+    [darkModeTiles]="true"
+    ariaLabel="Approximate member locations. Use arrow keys to pan and plus or minus to zoom."
+  />
+  <div class="map-buttons">
+    <ui-button size="small" variant="outlined" (click)="zoomChanged(zoom() + 1)" ariaLabel="Zoom in"
+      >+</ui-button
+    >
+    <ui-button
+      size="small"
+      variant="outlined"
+      (click)="zoomChanged(zoom() - 1)"
+      ariaLabel="Zoom out"
+      >−</ui-button
+    >
+  </div>
+  @for (marker of markers(); track marker.member.id) {
+  <button
+    class="avatar-marker"
+    type="button"
+    [style.left.px]="marker.x"
+    [style.top.px]="marker.y"
+    [attr.aria-label]="
+        marker.members.length > 1
+          ? 'View ' + marker.members.length + ' nearby members'
+          : 'View ' + marker.member.nickname
+      "
+    [attr.aria-expanded]="selected()?.id === marker.member.id"
+    (pointerdown)="$event.stopPropagation()"
+    (click)="selectGroup(marker.members, $event)"
+  >
+    <span
+      class="accuracy-circle"
+      [style.width.px]="marker.radius * 2"
+      [style.height.px]="marker.radius * 2"
+    ></span>
+    <ui-avatar
+      [src]="marker.member.avatarUrl || undefined"
+      [name]="marker.member.nickname"
+      [size]="40"
+    />
+    @if (marker.members.length > 1) {
+    <span class="cluster-count">{{ marker.members.length }}</span>
+    }
+  </button>
+  } @if (picked(); as point) {
+  <div
+    class="selection-radius"
+    [style.left.px]="point.x"
+    [style.top.px]="point.y"
+    [style.width.px]="point.radius * 2"
+    [style.height.px]="point.radius * 2"
+    role="img"
+    [attr.aria-label]="'Selected privacy radius: ' + selectionRadiusLabel()"
+  ></div>
+  <div
+    class="picked-marker"
+    [style.left.px]="point.x"
+    [style.top.px]="point.y"
+    aria-label="Selected approximate area"
+  >
+    +
+  </div>
+  } @if (selected(); as member) {
+  <a #card class="member-card" [routerLink]="['/members', member.id]">
+    <span class="eyebrow">A KINDRED MIND</span>
+    <div class="member-heading">
+      <ui-avatar [src]="member.avatarUrl || undefined" [name]="member.nickname" size="large" />
+      <div>
+        <h3>{{ member.nickname }}</h3>
+        <p>{{ member.punchline }}</p>
+      </div>
+    </div>
+    <div class="bio-preview">{{ biographyPreview(member.bio) }}</div>
+    <p class="small muted">
+      {{ member.lastCheckinAt ? intl.date(member.lastCheckinAt) : intl.noCheckin }}
+    </p>
+    <p class="small">{{ approximateDistance(member) }}</p>
+    <span class="card-link">Meet {{ member.nickname }} ↗</span>
+  </a>
+  } @if (selectedGroup().length) {
+  <div class="member-picker">
+    <span class="eyebrow">NEARBY KINDRED MINDS</span>
+    @for (person of selectedGroup(); track person.id) {
+    <button
+      type="button"
+      [attr.aria-label]="'View profile card for ' + person.nickname"
+      (click)="select(person, $event)"
+    >
+      <ui-avatar [name]="person.nickname" [src]="person.avatarUrl || undefined" size="small" />{{
+      person.nickname }}
+    </button>
+    }
+  </div>
+  }
+  <div class="map-caption">
+    <span class="status-dot"></span>{{ picking() ? selection() ? 'Selected area · ±' +
+    selectionRadiusLabel() + ' · tap to move' : 'Tap the map to choose an area' : 'Every dot is a
+    shared curiosity' }}
+  </div>
+</div>

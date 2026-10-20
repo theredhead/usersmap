@@ -1,0 +1,108 @@
+@if (api.session().member) {
+<section class="dashboard-intro">
+  <div>
+    <span class="eyebrow">SAME CURIOSITY. DIFFERENT COORDINATES.</span>
+    <h1>
+      A little closer,<br class="mobile-break" />
+      wherever you are<span>.</span>
+    </h1>
+  </div>
+  <p>
+    <strong>{{ store.members().length }}</strong> kindred minds<br /><span
+      >{{ store.locatedCount() }} places on the map</span
+    >
+  </p>
+</section>
+<section class="workspace">
+  @if (mobile()) {
+  <ui-tab-group panelStyle="flat" ariaLabel="Community views">
+    <ui-tab [label]="intl.map"><ng-container *ngTemplateOutlet="mapPanel" /></ui-tab>
+    <ui-tab [label]="intl.timeline"><app-timeline /></ui-tab>
+  </ui-tab-group>
+  } @else {
+  <ui-split-container
+    name="community"
+    [initialSizes]="[62, 38]"
+    ariaLabel="Resize map and timeline"
+  >
+    <ui-split-panel [min]="330"><ng-container *ngTemplateOutlet="mapPanel" /></ui-split-panel>
+    <ui-split-panel [min]="330"><app-timeline /></ui-split-panel>
+  </ui-split-container>
+  }
+</section>
+<p class="privacy-note">
+  ⌖ A little privacy by design. Only approximate areas are shared. Your exact coordinates are never
+  saved.
+</p>
+<ng-template #mapPanel>
+  <div class="map-panel">
+    <div class="map-toolbar">
+      <span>{{ intl.map }} <span class="muted">/ {{ store.locatedCount() }} members</span></span>
+      <ui-button size="small" variant="ghost" (click)="locate()" [disabled]="api.busy()"
+        >◎ Near me</ui-button
+      >
+    </div>
+    <app-member-map
+      [members]="store.members()"
+      [center]="store.mapCenter()"
+      [zoom]="store.mapZoom()"
+      (centerChange)="store.mapCenter.set($event)"
+      (zoomChange)="store.mapZoom.set($event)"
+    />
+    @if (!store.locatedCount()) {
+    <div class="map-empty">
+      <h3>Put your corner of the world on the map.</h3>
+      <p>Your location is optional, and always approximate.</p>
+      <a routerLink="/location">Make your first check-in ↗</a>
+    </div>
+    }
+  </div>
+</ng-template>
+} @else {
+<section class="landing">
+  <div class="landing-copy">
+    <span class="eyebrow">SMALL DEVICES. A WORLD OF CONNECTIONS.</span>
+    <h1>Still thinking<br />different<span>.</span></h1>
+    <p>Some things bring us together.<br />A green screen. A good idea. A Newton.</p>
+    <p class="muted">
+      Find your people, share what you’re making, and see where our little community calls home.
+    </p>
+    @if (api.configuration()!.discordConfigured) {
+    <a href="/api/auth/discord"><ui-button size="large">{{ intl.signIn }} ↗</ui-button></a>
+    } @else {
+    <div class="setup-note" role="status">
+      Your community is almost ready.<br /><span>Configure Discord login to open the doors.</span>
+    </div>
+    }
+    <span class="landing-footnote">A community space. Sign in with Discord to join.</span>
+  </div>
+  <div class="orbital" aria-hidden="true">
+    <div class="orbit orbit-one"></div>
+    <div class="orbit orbit-two"></div>
+    <div class="globe">
+      <span class="globe-line line-one"></span><span class="globe-line line-two"></span
+      ><span class="globe-line line-three"></span><span class="globe-equator"></span>
+    </div>
+    <span class="orbit-dot dot-one"></span><span class="orbit-dot dot-two"></span
+    ><span class="orbit-dot dot-three"></span>
+    <div class="coordinate-tag">
+      CONNECTED BY CURIOSITY<br />
+      <strong>{{ api.configuration()!.siteName }} / worldwide</strong>
+    </div>
+  </div>
+</section>
+<section class="values-strip">
+  <div>
+    <span>FIND YOUR PEOPLE</span>
+    <p>A world map, a familiar face.</p>
+  </div>
+  <div>
+    <span>SHARE THE EVERYDAY</span>
+    <p>Small updates. Good conversations.</p>
+  </div>
+  <div>
+    <span>STAY A LITTLE PRIVATE</span>
+    <p>Your area, never your address.</p>
+  </div>
+</section>
+}

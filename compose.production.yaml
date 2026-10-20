@@ -1,0 +1,58 @@
+services:
+  newton-users:
+    image: ${USERSMAP_IMAGE:-theredhead/usersmap:latest}
+    build:
+      context: .
+    environment:
+      NODE_ENV: production
+      PUBLIC_URL: ${PUBLIC_URL:?Set PUBLIC_URL to the public HTTPS origin}
+      SITE_NAME: ${SITE_NAME:-Newton users}
+      DATABASE_URL: postgres://newton:${POSTGRES_PASSWORD:?Set a strong URL-safe POSTGRES_PASSWORD}@newton-users-database:5432/newton
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:?Set DISCORD_CLIENT_ID}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:?Set DISCORD_CLIENT_SECRET}
+      THEME_PRIMARY: ${THEME_PRIMARY:-#b2d279}
+      THEME_SURFACE: ${THEME_SURFACE:-#182a21}
+      THEME_BACKGROUND: ${THEME_BACKGROUND:-#101c16}
+      THEME_TEXT: ${THEME_TEXT:-#e4ecd8}
+      LOCATION_MINIMUM_KM: ${LOCATION_MINIMUM_KM:-1}
+      LOCATION_DEFAULT_KM: ${LOCATION_DEFAULT_KM:-5}
+      LOCATION_MAXIMUM_KM: ${LOCATION_MAXIMUM_KM:-25}
+      POST_INTERVAL_SECONDS: ${POST_INTERVAL_SECONDS:-60}
+      MAXIMUM_UPLOAD_BYTES: ${MAXIMUM_UPLOAD_BYTES:-25000000}
+      MAXIMUM_VIDEO_SECONDS: ${MAXIMUM_VIDEO_SECONDS:-60}
+      PROFILE_SCHEMA_PATH: /app/config/profile-form.json
+      TILE_URL: ${TILE_URL:-https://tile.openstreetmap.org/{z}/{x}/{y}.png}
+      TILE_ATTRIBUTION: ${TILE_ATTRIBUTION:-© OpenStreetMap contributors}
+    networks:
+      - default
+      - newton-users-database
+    depends_on:
+      newton-users-database:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  newton-users-database:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: newton
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a strong URL-safe POSTGRES_PASSWORD}
+      POSTGRES_DB: newton
+    volumes:
+      - newton-users-data:/var/lib/postgresql/data
+    networks:
+      - newton-users-database
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U newton -d newton']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+networks:
+  newton-users-database:
+    internal: true
+volumes:
+  newton-users-data:

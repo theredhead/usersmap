@@ -1,0 +1,58 @@
+name: newton-users
+services:
+  app:
+    build: .
+    ports:
+      - '${BIND_ADDRESS:-127.0.0.1}:${PORT:-3000}:3000'
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
+      SITE_NAME: ${SITE_NAME:-Newton users}
+      DATABASE_URL: postgres://newton:${POSTGRES_PASSWORD:-newton-local-only}@database:5432/newton
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+      THEME_PRIMARY: ${THEME_PRIMARY:-#b2d279}
+      THEME_SURFACE: ${THEME_SURFACE:-#182a21}
+      THEME_BACKGROUND: ${THEME_BACKGROUND:-#101c16}
+      THEME_TEXT: ${THEME_TEXT:-#e4ecd8}
+      LOCATION_MINIMUM_KM: ${LOCATION_MINIMUM_KM:-1}
+      LOCATION_DEFAULT_KM: ${LOCATION_DEFAULT_KM:-5}
+      LOCATION_MAXIMUM_KM: ${LOCATION_MAXIMUM_KM:-25}
+      POST_INTERVAL_SECONDS: ${POST_INTERVAL_SECONDS:-60}
+      MAXIMUM_UPLOAD_BYTES: ${MAXIMUM_UPLOAD_BYTES:-25000000}
+      MAXIMUM_VIDEO_SECONDS: ${MAXIMUM_VIDEO_SECONDS:-60}
+      PROFILE_SCHEMA_PATH: /app/config/profile-form.json
+      TILE_URL: ${TILE_URL:-https://tile.openstreetmap.org/{z}/{x}/{y}.png}
+      TILE_ATTRIBUTION: ${TILE_ATTRIBUTION:-© OpenStreetMap contributors}
+    volumes:
+      - type: bind
+        source: ./config/profile-form.json
+        target: /app/config/profile-form.json
+        read_only: true
+        bind:
+          create_host_path: false
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  database:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: newton
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-newton-local-only}
+      POSTGRES_DB: newton
+    volumes:
+      - database-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U newton -d newton']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+volumes:
+  database-data:

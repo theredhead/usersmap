@@ -1,0 +1,66 @@
+<div class="page-heading">
+  <a routerLink="/">← Back to the world</a
+  ><span class="eyebrow">SOMEWHERE ON THIS LITTLE PLANET</span>
+  <h1>A place, not an address.</h1>
+  <p>Choose your area with GPS or tap the map. Nothing is saved until you confirm.</p>
+</div>
+@if (api.session().member) {
+<div class="location-layout">
+  <div class="location-map">
+    <app-member-map
+      [center]="center()"
+      [zoom]="zoom()"
+      [picking]="true"
+      [selection]="selected()"
+      [selectionRadiusKm]="radiusKm()"
+      (centerChange)="center.set($event)"
+      (zoomChange)="zoom.set($event)"
+      (locationSelected)="selectLocation($event)"
+    />
+  </div>
+  <section class="form-panel" [class.is-busy]="api.busy()">
+    <ui-button variant="outlined" (click)="useGps()" [disabled]="api.busy()"
+      >◎ Use my GPS location</ui-button
+    >
+    <p class="small muted" role="status">
+      {{ selected() ? 'Area selected. Adjust the privacy radius below.' : 'Choose a point on the map
+      or use GPS first.' }}
+    </p>
+    <ui-form
+      [engine]="engine"
+      [fieldMinWidth]="200"
+      [submitLabel]="kind() === 'checkin' ? intl.checkIn : intl.saveLocation"
+      (formSubmit)="save($event)"
+    />
+    <p class="small muted">
+      Only a coarse area is stored. No addresses, no past locations. Minimum {{
+      intl.radius(policy.minimumRadiusKm, unit) }}; default {{ intl.radius(policy.defaultRadiusKm,
+      unit) }}; maximum {{ intl.radius(policy.maximumRadiusKm, unit) }} radius.
+    </p>
+    <section class="existing-locations">
+      <h3>Your current locations</h3>
+      @for (location of api.session().member!.locations; track location.kind) {
+      <div class="saved-location">
+        <span
+          >{{ location.kind === 'checkin' ? 'Check-in' : location.kind === 'home' ? 'Home' : 'Work'
+          }}<small>{{ intl.date(location.updatedAt) }}</small></span
+        >
+        <ui-button
+          size="small"
+          variant="ghost"
+          (click)="remove(location.kind)"
+          [disabled]="api.busy()"
+          >Remove</ui-button
+        >
+      </div>
+      } @empty {
+      <p class="small muted">No locations saved. That’s perfectly fine, too.</p>
+      }
+    </section>
+  </section>
+</div>
+} @else {
+<div class="empty-state">
+  <a href="/api/auth/discord">Sign in with Discord to save a location.</a>
+</div>
+}

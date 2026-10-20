@@ -1,0 +1,35 @@
+<header class="site-header">
+  <a class="brand" routerLink="/" aria-label="Community home">
+    <span class="brand-mark" aria-hidden="true">n<span>↗</span></span>
+    <span>{{ api.configuration()?.siteName }}<small>A WORLD OF KINDRED MINDS</small></span>
+  </a>
+  <nav aria-label="Main navigation">
+    @if (api.session().member; as member) {
+    <a routerLink="/location"><ui-button size="small">{{ intl.checkIn }}</ui-button></a>
+    <a routerLink="/settings" [attr.aria-label]="intl.profile"
+      ><ui-avatar [name]="member.nickname" [src]="member.avatarUrl || undefined" size="small"
+    /></a>
+    <ui-button variant="ghost" size="small" (click)="logout()" [disabled]="api.busy()"
+      >Sign out</ui-button
+    >
+    } @else {
+    <a href="/api/auth/discord"
+      ><ui-button size="small" [disabled]="!api.configuration()?.discordConfigured"
+        >{{ intl.signIn }}</ui-button
+      ></a
+    >
+    }
+  </nav>
+</header>
+@if (api.error()) {
+<aside class="alert error" role="alert">
+  {{ api.error() }}
+  <ui-button variant="ghost" size="small" (click)="api.error.set('')">Dismiss</ui-button>
+</aside>
+} @if (api.notice()) {
+<aside class="alert" role="status">{{ api.notice() }}</aside>
+}
+<main><router-outlet /></main>
+<footer>
+  Made for people who still think differently.<span>Approximate places. Real connections.</span>
+</footer>

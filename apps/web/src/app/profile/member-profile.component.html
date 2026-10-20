@@ -1,0 +1,38 @@
+<div class="page-heading">
+  <a routerLink="/">← Back to the world</a><span class="eyebrow">ONE OF OUR OWN</span>
+</div>
+@if (member(); as person) {
+<article class="member-profile form-panel">
+  <ui-avatar [src]="person.avatarUrl || undefined" [name]="person.nickname" [size]="100" />
+  <h1>{{ person.nickname }}</h1>
+  <p class="punchline">{{ person.punchline }}</p>
+  <div class="profile-bio" [innerHTML]="person.bio"></div>
+  <div class="location-info">
+    <span class="eyebrow">LAST CHECK-IN</span>
+    <p>{{ person.lastCheckinAt ? intl.date(person.lastCheckinAt) : intl.noCheckin }}</p>
+    @if (person.location; as location) {
+    <p class="small muted">
+      {{ location.kind === 'checkin' ? 'Checked in' : location.kind === 'home' ? 'Home area' : 'Work
+      area' }} · {{ intl.distance(location.radiusKm, api.session().member?.unit || 'km') }} privacy
+      radius
+    </p>
+    @if (location.comment) {
+    <blockquote>{{ location.comment }}</blockquote>
+    } }
+  </div>
+  @for (group of api.configuration()!.profileSchema.groups; track group.id) {
+  <section class="custom-answers">
+    <h2>{{ group.title }}</h2>
+    @for (field of group.fields; track field.id) { @if (person.customAnswers[field.id]; as answer) {
+    <div class="answer">
+      <span>{{ field.title }}</span><strong>{{ answer === true ? '✓' : answer }}</strong>
+    </div>
+    } }
+  </section>
+  }
+</article>
+} @else {
+<div class="empty-state">
+  {{ api.error() ? 'This profile could not be loaded.' : 'Loading profile…' }}
+</div>
+}
